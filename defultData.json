@@ -1,0 +1,14 @@
+{
+  "numPlayers": 0,
+  "largestHand": 5,
+  "roundNum": 1,
+  "cardCountDirection": "Down",
+  "players": [],
+  "roundData": [
+    {
+      "roundNum": 1,
+      "numOfCards": 1,
+      "totalBid": 0
+    }
+  ]
+}
