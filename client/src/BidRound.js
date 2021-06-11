@@ -1,14 +1,86 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import React from 'react';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
-import Container from 'react-bootstrap/Container';
-import Button from 'react-bootstrap/Button';
-import InputGroup from 'react-bootstrap/InputGroup';
-import FormControl from 'react-bootstrap/FormControl';
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Grid from '@material-ui/core/Grid';
+import PersonIcon from '@material-ui/icons/Person';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
+import TextField from '@material-ui/core/TextField';
+import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import FaultyGamePlayAlert from './FaultyGamePlayAlert';
 
+const useStyles = makeStyles((theme) => ({
+  bidSection: {
+    marginTop: theme.spacing(2),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: theme.spacing(2),
+  },
+  buttonContainer: {
+    marginTop: theme.spacing(2),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: theme.spacing(2),
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
+
+
+function PlayerBidSection(props){
+  var classes = useStyles();
+  return(
+    <Paper  variant="outlined">
+    <Container component="section" maxWidth="xs" className={classes.bidSection}>
+    <Avatar className={classes.avatar}>
+      <PersonIcon />
+    </Avatar>
+      <Typography component="h2" variant="h3">
+          {props.name}
+      </Typography>
+      <Typography component="h3" variant="h3">
+        score {props.score}
+      </Typography>
+      <TextField id="cardNumTextField"
+        value={props.playerBid}
+        label="Bid" variant="outlined"
+        onChange={props.handleChange}
+        fullWidth/>
+    </Container>
+    </Paper>
+  );
+}
+
+function SubmitBidsButton(props){
+  var classes = useStyles();
+  return(
+    <Container component="section" maxWidth="xs" className={classes.buttonContainer}>
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={props.goToScoreRound}
+      className={classes.submit}
+      startIcon={<ArrowForwardIcon/>}>
+      Submit Bids
+    </Button>
+    </Container>
+  );
+}
 class Player extends React.Component{
   constructor(){
     super();
@@ -25,35 +97,16 @@ class Player extends React.Component{
     this.props.handleBidChange(this.props.id,this.props.roundid, b);
     this.setState({playerBid: b})
   }
-
-
-
   render(){
     return(
-      <Col xs={4} >
-        <Row>
-          <Col xs={4}/>
-          <p>{this.props.name}</p>
-        </Row>
-        <Row>
-          <Col xs={4}/>
-          <p>score {this.props.score} bid { this.state.playerBid}</p>
-        </Row>
-        <Row>
-          <Col xs={2}/>
-          <Col xs={8}>
-          <InputGroup className="mb-3">
-            <InputGroup.Prepend>
-              <InputGroup.Text >Bid</InputGroup.Text>
-            </InputGroup.Prepend>
-            <FormControl placeholder=" " value={this.state.playerBid} onChange={this.handleChange} aria-describedby="basic-addon1" />
-          </InputGroup>
-          </Col>
-          <Col xs={2}/>
-
-        </Row>
-      </Col>
-
+      <Grid item xs={12} lg={4}>
+        <PlayerBidSection
+          name={this.props.name}
+          playerBid={  this.state.playerBid}
+          score={this.props.score}
+          handleChange={this.handleChange}
+        />
+      </Grid>
     );
   }
 };
@@ -65,6 +118,7 @@ export default class BidRound extends React.Component  {
     super();
     this.handleBidChange = this.handleBidChange.bind(this);
     this.handleAlert = this.handleAlert.bind(this);
+    this.goToScoreRound = this.goToScoreRound.bind(this);
     this.state = {
       showAlert: false,
       roundNum:'',
@@ -84,7 +138,6 @@ export default class BidRound extends React.Component  {
   componentDidMount() {
     this.loadData();
   }
-
   loadData() {
     fetch('/api/bidround').then(response => response.json()).then(data => {
     this.setState({
@@ -94,11 +147,7 @@ export default class BidRound extends React.Component  {
        cardsThisHand: data.roundData[(data.roundData.length -1)].numOfCards,
      });
    }).catch(err => {console.log(err);});
-
-
   }
-
-
   goToScoreRound(){
     if(this.state.totalBid!==this.state.cardsThisHand){
       window.open("/scoreround","_self");
@@ -117,23 +166,40 @@ export default class BidRound extends React.Component  {
       score={player.score}
       handleBidChange={this.handleBidChange}
       />);
-
     return (
-      <>
-      <Container  as="main" className ="App">
-        <Container as="section">
-          <h1>Bid Round</h1>
-          <h2>Round {this.state.roundNum} Cards {this.state.cardsThisHand} Toatal Bid {this.state.totalBid}</h2>
-        </Container>
-        <Container as="section">
-          <Row>{PlayerList}</Row>
-        </Container>
-        <Button className="align-self-center" varient="primary" onClick={this.goToScoreRound.bind(this)}>Submit Bids</Button>
+      <Container component="main" maxWidth="lg">
+        <CssBaseline />
+        <Grid
+          container
+          direction="row"
+          justify="center"
+          alignItems="flex-start"
+          spacing={0}>
+          <Grid item xs={12} md={4}>
+            <Typography className="bannerText" component="h1" variant="h2">Round {this.state.roundNum} </Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography className="bannerText" component="h1" variant="h2"> Cards {this.state.cardsThisHand}</Typography>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Typography className="bannerText" component="h1" variant="h2">Total Bid {this.state.totalBid}</Typography>
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          direction="row"
+          justify="flex-start"
+          alignItems="flex-start"
+          spacing={3}>
+          {PlayerList}
+        </Grid>
+        <SubmitBidsButton goToScoreRound={this.goToScoreRound}/>
+        <FaultyGamePlayAlert
+          isShown={this.state.showAlert}
+          handleAlert={this.handleAlert}
+          alertType="BiddingError"
+          />
       </Container>
-      <FaultyGamePlayAlert isShown={this.state.showAlert}
-      handleAlert={this.handleAlert}
-      alertType="BiddingError"/>
-      </>
   );
  }
 }

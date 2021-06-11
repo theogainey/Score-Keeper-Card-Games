@@ -1,9 +1,22 @@
 {
-  "numPlayers": 0,
+  "numPlayers": 2,
   "largestHand": 5,
   "roundNum": 1,
   "cardCountDirection": "Down",
-  "players": [],
+  "players": [
+    {
+      "id": 0,
+      "name": "Theo",
+      "currentBid": 0,
+      "score": 0
+    },
+    {
+      "id": 1,
+      "name": " Bob",
+      "currentBid": 0,
+      "score": 0
+    }
+  ],
   "roundData": [
     {
       "roundNum": 1,

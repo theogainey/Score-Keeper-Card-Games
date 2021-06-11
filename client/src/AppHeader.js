@@ -10,10 +10,10 @@ export default class AppHeader extends React.Component  {
     //Navs
     //Rules in Nav
     return(
-      <Container fluid as="header" className= "App-Header">
+      <Container  as="header" className= "App-Header">
         <Row className="justify-content-center">
           <Col>
-            <h1>Oh Hell</h1>
+            <h1>Card Score Keeper Header</h1>
           </Col>
         </Row>
       </Container>
