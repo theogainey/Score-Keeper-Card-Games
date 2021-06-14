@@ -38,13 +38,13 @@ function AlertModal(props){
     <Modal open={props.show} onClose={handleClose}>
       <Container component="main" maxWidth="sm">
       <Paper  variant="outlined" className={classes.alertStyles}>
-        <Container className="bannerText" component="heading" maxWidth="lg">
+        <Container className="bannerText" component="header" maxWidth="lg">
           <Typography  component="h1" variant="h2">
             Warning!
           </Typography>
         </Container>
         <Container component="section" maxWidth="xs">
-          <Typography  component="body1" >
+          <Typography  variant="body1" >
             {props.alertMessage}
           </Typography>
         </Container>
