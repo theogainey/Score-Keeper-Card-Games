@@ -69,6 +69,7 @@ export default function HomePage() {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick={() => {window.open("https://www.pagat.com/exact/ohhell.html");}}
           >
             Rule Book
           </Button>
