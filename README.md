@@ -8,5 +8,5 @@
  The easiest way to start this app is to visit the live demo at https://card-scorer.herokuapp.com/ 
  *Note this demo sleeps after 30 min of inactivity so it may take a few seconds for the demo to wake up*
  To start this app on your local system you must open a command line both in the main directory and in the client subdirectory 
- in the main directory use the command npm start to start the server then in the client subdirectory use teh command npm run start to start the app's front end 
+ in the main directory use the command npm start to start the server then in the client subdirectory use the command npm run start to start the app's front end 
 
