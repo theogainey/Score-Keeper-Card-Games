@@ -17,10 +17,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //get defult game data
 app.get('/api/data', (req, res) => {
- var metadata = {};
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
- res.json({ _metadata: metadata, players: gameDataParsed.players });
+ res.json({players: gameDataParsed.players });
 });
 
 //reset game data
@@ -33,8 +32,7 @@ app.put('/api/resetgamedata', (req, res) => {
  gameDataParsed.numPlayers=0;
  fs.writeFile('gameData.json', writeData, done)
  function done(){
-   var metadata = {};
-   res.json({ _metadata: metadata, players: defultDataParsed.players });
+   res.json({players: defultDataParsed.players });
   }
 });
 
@@ -176,7 +174,7 @@ app.get('/api/totalbids', (req, res) => {
 });
 
 
-//update scores after a round 
+//update scores after a round
 app.put('/api/score/:roundNum/:newscores', (req, res) => {
   var newscores = JSON.parse(req.params.newscores);
   var round = JSON.parse(req.params.roundNum);
