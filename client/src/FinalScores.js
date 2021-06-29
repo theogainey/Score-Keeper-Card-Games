@@ -99,7 +99,7 @@ export default class FinalScores extends React.Component  {
    }).catch(err => {console.log(err);});
   }
   startNewGame(){
-    fetch('/api/resetgamedata',{method: 'post'}).then( window.open("/","_self"));
+    fetch('/api/resetgamedata',{method: 'put'}).then( window.open("/","_self"));
 
   }
   render(){

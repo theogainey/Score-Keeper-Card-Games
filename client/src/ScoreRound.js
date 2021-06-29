@@ -189,9 +189,8 @@ export default class ScoreRound extends React.Component  {
 
       });
       encodedString=encodedString+"%5D";
-      fetch('/api/score/'+this.state.roundNum+'/'+encodedString,{method: 'post'}).then(response => response.json()).then(data => {
-        }).catch(err => {console.log(err);});
-      encodedString=null;
+      fetch('/api/score/'+this.state.roundNum+'/'+encodedString,{method: 'put'}).then(response => response.json()).then(data => {
+      }).then(()=>{
       //decide to bid another round or go to final Scores
       if((this.state.cardCountDirection==="Up")&&(this.state.cardsThisHand===this.state.largestHand)){
         window.open("/finalscores","_self");
@@ -199,7 +198,10 @@ export default class ScoreRound extends React.Component  {
       else{
         window.open("/bidround","_self");
       }
+    });
     }
+
+    //else show alert when scores aren't consitent with the rules of the game
     else {
       this.setState({showAlert: true});
     }

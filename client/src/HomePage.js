@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 export default function HomePage() {
   const classes = useStyles();
   function goToGame(){
-    fetch('/api/resetgamedata',{method: 'post'}).then( window.open("/oh-hell","_self"));
+    fetch('/api/resetgamedata',{method: 'put'}).then( window.open("/oh-hell","_self"));
 
   }
 

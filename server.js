@@ -24,7 +24,7 @@ app.get('/api/data', (req, res) => {
 });
 
 //reset game data
-app.post('/api/resetgamedata', (req, res) => {
+app.put('/api/resetgamedata', (req, res) => {
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
  var defultData = fs.readFileSync('defultData.json');
@@ -64,8 +64,8 @@ app.post('/api/newplayer/:playername?', (req, res) => {
   }
 });
 
-//Post Data needed to start game.
-app.post('/api/startgame/:largesthand', (req, res) => {
+//Put Method update data needed to start game.
+app.put('/api/startgame/:largesthand', (req, res) => {
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
  gameDataParsed.largestHand = parseInt(req.params.largesthand);
@@ -131,8 +131,8 @@ app.get('/api/finalscores', (req, res) => {
 });
 
 
-//post player bid
-app.post('/api/bid/:playerid/:roundid/:newbid', (req, res) => {
+//update player's bid
+app.put('/api/bid/:playerid/:roundid/:newbid', (req, res) => {
  var playerid= req.params.playerid;
  var roundid = req.params.roundid;
  var newbid = req.params.newbid;
@@ -176,8 +176,8 @@ app.get('/api/totalbids', (req, res) => {
 });
 
 
-//score round
-app.post('/api/score/:roundNum/:newscores', (req, res) => {
+//update scores after a round 
+app.put('/api/score/:roundNum/:newscores', (req, res) => {
   var newscores = JSON.parse(req.params.newscores);
   var round = JSON.parse(req.params.roundNum);
   var gameData = fs.readFileSync('gameData.json');
@@ -213,6 +213,7 @@ app.post('/api/score/:roundNum/:newscores', (req, res) => {
    res.json({ status: 'success'  });
    }
 });
+
 if (process.env.NODE_ENV === 'production') {
   // Serve any static files
   app.use(express.static(path.join(__dirname, 'client/build')));

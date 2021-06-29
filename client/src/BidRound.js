@@ -131,7 +131,7 @@ export default class BidRound extends React.Component  {
     this.setState({showAlert: false});
   }
   handleBidChange(id, roundid, bid){
-    fetch('/api/bid/'+id+'/'+roundid+'/'+bid,{method: 'post'}).then(response => response.json()).then(data => {
+    fetch('/api/bid/'+id+'/'+roundid+'/'+bid,{method: 'put'}).then(response => response.json()).then(data => {
     this.setState({ players: data.players, totalBid: data.totalBid});
    }).catch(err => {console.log(err);});
   }

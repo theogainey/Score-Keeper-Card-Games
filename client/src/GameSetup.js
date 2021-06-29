@@ -194,13 +194,13 @@ export default class GameSetup extends React.Component  {
   }
 
  resetPlayers(){
-   fetch('/api/resetgamedata',{method: 'post'}).then(response => response.json()).then(data => {
+   fetch('/api/resetgamedata',{method: 'put'}).then(response => response.json()).then(data => {
    this.setState({ players: data.players });
   }).catch(err => {console.log(err);});
  }
  startGame(props){
    if(!(this.state.largestHand===0)&&(this.state.players.length>=2)){
-     fetch('/api/startgame/' + this.state.largestHand,{method: 'post'}).then(response => response.json()).then(data => {
+     fetch('/api/startgame/' + this.state.largestHand,{method: 'put'}).then(() => {
        window.open("/bidround","_self");
       }).catch(err => {console.log(err);});
    }
