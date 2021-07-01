@@ -13,6 +13,7 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import Switch from '@material-ui/core/Switch';
 import FaultyGamePlayAlert from './FaultyGamePlayAlert';
+import {useParams} from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -123,8 +124,13 @@ class Player extends React.Component{
   }
 };
 
-
-export default class ScoreRound extends React.Component  {
+export default function ScoreRoundFunction(){
+  let {id} = useParams();
+  return(
+    <ScoreRound gameID={id}/>
+  )
+}
+class ScoreRound extends React.Component  {
 
   constructor(){
     super();
@@ -152,6 +158,8 @@ export default class ScoreRound extends React.Component  {
     playersBidStatus = null;
   }
    calculateScores(){
+     var id = this.props.gameID;
+
      //total number of made bids
     var playersBidStatus = this.state.playersMadeBidStatus.slice();
     var totalMadeBids=0
@@ -189,14 +197,14 @@ export default class ScoreRound extends React.Component  {
 
       });
       encodedString=encodedString+"%5D";
-      fetch('/api/score/'+this.state.roundNum+'/'+encodedString,{method: 'put'}).then(response => response.json()).then(data => {
+      fetch('/api/score/'+id+'/' +this.state.roundNum+'/'+encodedString,{method: 'put'}).then(response => response.json()).then(data => {
       }).then(()=>{
       //decide to bid another round or go to final Scores
       if((this.state.cardCountDirection==="Up")&&(this.state.cardsThisHand===this.state.largestHand)){
-        window.open("/finalscores","_self");
+        window.open("/finalscores/"+id,"_self");
       }
       else{
-        window.open("/bidround","_self");
+        window.open("/bidround/"+id,"_self");
       }
     });
     }
@@ -234,7 +242,8 @@ export default class ScoreRound extends React.Component  {
   }
 
   loadData() {
-    fetch('/api/scoreround').then(response => response.json()).then(data => {
+    var id = this.props.gameID;
+    fetch('/api/scoreround/'+id).then(response => response.json()).then(data => {
     this.setState({
        roundNum:data.roundData[(data.roundData.length -1)].roundNum ,
        players: data.players,

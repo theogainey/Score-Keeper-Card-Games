@@ -12,6 +12,8 @@ import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import FaultyGamePlayAlert from './FaultyGamePlayAlert';
+import {useParams} from "react-router-dom";
+
 
 const useStyles = makeStyles((theme) => ({
   bidSection: {
@@ -110,9 +112,15 @@ class Player extends React.Component{
     );
   }
 };
+export default function BidRoundFunction(){
+  var {id} = useParams();
+  return(
+    <BidRound gameID={id}/>
+  )
+}
 
 
-export default class BidRound extends React.Component  {
+ class BidRound extends React.Component  {
 
   constructor(){
     super();
@@ -131,15 +139,17 @@ export default class BidRound extends React.Component  {
     this.setState({showAlert: false});
   }
   handleBidChange(id, roundid, bid){
-    fetch('/api/bid/'+id+'/'+roundid+'/'+bid,{method: 'put'}).then(response => response.json()).then(data => {
+    var gameID= this.props.gameID;
+    fetch('/api/bid/'+gameID+'/'+id+'/'+roundid+'/'+bid,{method: 'put'}).then(response => response.json()).then(data => {
     this.setState({ players: data.players, totalBid: data.totalBid});
    }).catch(err => {console.log(err);});
   }
   componentDidMount() {
-    this.loadData();
+    var id = this.props.gameID;
+    this.loadData(id);
   }
-  loadData() {
-    fetch('/api/bidround').then(response => response.json()).then(data => {
+  loadData(id) {
+    fetch('/api/bidround/'+id).then(response => response.json()).then(data => {
     this.setState({
        roundNum:data.roundData[(data.roundData.length -1)].roundNum ,
        players: data.players,
@@ -150,7 +160,8 @@ export default class BidRound extends React.Component  {
   }
   goToScoreRound(){
     if(this.state.totalBid!==this.state.cardsThisHand){
-      window.open("/scoreround","_self");
+      let gameID=this.props.gameID;
+      window.open("/scoreround/"+gameID,"_self");
     }
     else {
       this.setState({showAlert: true});

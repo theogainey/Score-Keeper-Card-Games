@@ -10,6 +10,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import PlayCircleFilledWhiteIcon from '@material-ui/icons/PlayCircleFilledWhite';
+import {useParams} from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -77,9 +78,15 @@ function Player(props){
    );
 };
 
+export default function FinalScoresFunction(){
+  let {id} = useParams();
+  return(
+    <FinalScores gameID={id}/>
+  )
+}
 
 
-export default class FinalScores extends React.Component  {
+class FinalScores extends React.Component  {
   constructor(){
     super();
     this.startNewGame= this.startNewGame.bind(this);
@@ -88,19 +95,20 @@ export default class FinalScores extends React.Component  {
     };
   }
   componentDidMount() {
-    this.loadData();
+    var id = this.props.gameID;
+    this.loadData(id);
   }
 
-  loadData() {
-    fetch('/api/finalscores').then(response => response.json()).then(data => {
+  loadData(id) {
+    fetch('/api/finalscores/'+id).then(response => response.json()).then(data => {
     this.setState({
        players: data.players,
      });
    }).catch(err => {console.log(err);});
   }
   startNewGame(){
-    fetch('/api/resetgamedata',{method: 'put'}).then( window.open("/","_self"));
-
+    var id = this.props.gameID;
+    fetch('/api/cleargame/'+id,{method: 'delete'}).then( window.open("/","_self"));
   }
   render(){
     var PlayerList = this.state.players.map(player =><Player key={player.id} name={player.name} score={player.score}/>);

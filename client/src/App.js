@@ -4,11 +4,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 //import AppHeader from './AppHeader';
 import HomePage from './HomePage';
-import GameSetup from './GameSetup';
-import BidRound from './BidRound';
-import ScoreBoard from './ScoreBoard';
-import ScoreRound from './ScoreRound';
-import FinalScores from './FinalScores';
+import GameSetupFunction from './GameSetup';
+import BidRoundFunction from './BidRound';
+import ScoreBoardFunction from './ScoreBoard';
+import ScoreRoundFunction from './ScoreRound';
+import FinalScoresFunction from './FinalScores';
 import AppFooter from './AppFooter';
 import {
   BrowserRouter as Router,
@@ -37,20 +37,20 @@ export default function App() {
           <Route exact path="/">
             <HomePage />
           </Route>
-          <Route exact path="/oh-hell">
-            <GameSetup />
+          <Route  path="/oh-hell/:id">
+            <GameSetupFunction />
           </Route>
-          <Route exact path="/bidround">
-            <BidRound/>
+          <Route  path="/bidround/:id">
+            <BidRoundFunction/>
           </Route>
-          <Route exact path="/scoreround">
-            <ScoreRound />
+          <Route  path="/scoreround/:id">
+            <ScoreRoundFunction />
           </Route>
-          <Route exact path="/scoreboard">
-            <ScoreBoard />
+          <Route exact path="/scoreboard/:id">
+            <ScoreBoardFunction />
           </Route>
-          <Route exact path="/finalscores">
-            <FinalScores />
+          <Route exact path="/finalscores/:id">
+            <FinalScoresFunction />
           </Route>
         </Switch>
         <AppFooter/>

@@ -14,6 +14,55 @@ const fs = require('fs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+//get game data by id
+app.get('/api/getgamedata/:gameID', (req, res)=>{
+  var gameID= req.params.gameID;
+  var gameData = fs.readFileSync('gameData.json');
+  var gameDataParsed = JSON.parse(gameData);
+  var thisGameData = gameDataParsed.gameDataObjects[gameID];
+  res.json({gameData: thisGameData});
+});
+
+//post new game id
+app.post('/api/postnewgame', (req,res)=>{
+  var defultData = fs.readFileSync('defultData.json');
+  var defultDataParsed = JSON.parse(defultData);
+  //assign id here
+  var gameData = fs.readFileSync('gameData.json');
+  var gameDataParsed = JSON.parse(gameData);
+  var newgameID = gameDataParsed.gameDataObjects.length;
+  gameDataParsed.gameDataObjects[newgameID]=defultDataParsed;
+  gameDataParsed.gameDataObjects[newgameID].gameID= newgameID;
+  var writeData = JSON.stringify(gameDataParsed, null,2);
+  fs.writeFile('gameData.json', writeData, done)
+  function done(){
+    res.json({gameID: newgameID });
+   }
+});
+// reset game data
+app.delete('/api/cleardata', (req, res)=>{
+  var gameData = fs.readFileSync('gameData.json');
+  var gameDataParsed = JSON.parse(gameData);
+  gameDataParsed.gameDataObjects=[];
+  var writeData = JSON.stringify(gameDataParsed, null,2);
+  fs.writeFile('gameData.json', writeData, done)
+  function done(){
+    res.json({response: "sucess" });
+   }
+});
+
+//clearout a games records
+app.delete('/api/cleargame/:gameID', (req, res)=>{
+  var gameID = req.params.gameID;
+  var gameData = fs.readFileSync('gameData.json');
+  var gameDataParsed = JSON.parse(gameData);
+  gameDataParsed.gameDataObjects[gameID]=null;
+  var writeData = JSON.stringify(gameDataParsed, null,2);
+  fs.writeFile('gameData.json', writeData, done)
+  function done(){
+    res.json({response: "sucess" });
+   }
+});
 
 //get defult game data
 app.get('/api/data', (req, res) => {
@@ -22,39 +71,50 @@ app.get('/api/data', (req, res) => {
  res.json({players: gameDataParsed.players });
 });
 
+//get game data by ID
+app.get('/api/data/:gameID', (req, res)=>{
+  var gameID = req.params.gameID;
+  var gameData = fs.readFileSync('gameData.json');
+  var gameDataParsed = JSON.parse(gameData);
+  var players = gameDataParsed.gameDataObjects[gameID].players;
+  res.json({players: players});
+});
+
 //reset game data
-app.put('/api/resetgamedata', (req, res) => {
+app.put('/api/resetgamedata/:gameID', (req, res) => {
+ var gameID = req.params.gameID;
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
- var defultData = fs.readFileSync('defultData.json');
- var defultDataParsed = JSON.parse(defultData);
- var writeData = JSON.stringify(defultDataParsed, null,2);
- gameDataParsed.numPlayers=0;
+ gameDataParsed.gameDataObjects[gameID].players=[];
+ gameDataParsed.gameDataObjects[gameID].numPlayers=0;
+ var players= gameDataParsed.gameDataObjects[gameID].players;
+ var writeData = JSON.stringify(gameDataParsed, null,2);
  fs.writeFile('gameData.json', writeData, done)
  function done(){
-   res.json({players: defultDataParsed.players });
+   res.json({players: players });
   }
 });
 
 
 //add player
-app.post('/api/newplayer/:playername?', (req, res) => {
+app.post('/api/newplayer/:gameID/:playername', (req, res) => {
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
+ var gameID = req.params.gameID;
  if(req.params.playername){
-  var playerid= gameDataParsed.numPlayers;
+  var playerid= gameDataParsed.gameDataObjects[gameID].numPlayers;
   var playername= req.params.playername;
-  gameDataParsed.players[playerid]= {
+  gameDataParsed.gameDataObjects[gameID].players[playerid]= {
    id: playerid,
    name: playername ,
    currentBid: 0,
    score: 0
   };
-  gameDataParsed.numPlayers++;
+  gameDataParsed.gameDataObjects[gameID].numPlayers++;
   var writeData = JSON.stringify(gameDataParsed, null,2);
   fs.writeFile('gameData.json', writeData, done)
   function done(){
-    res.json({ players: gameDataParsed.players  });
+    res.json({ players: gameDataParsed.gameDataObjects[gameID].players  });
   }
  }
   else{
@@ -63,11 +123,12 @@ app.post('/api/newplayer/:playername?', (req, res) => {
 });
 
 //Put Method update data needed to start game.
-app.put('/api/startgame/:largesthand', (req, res) => {
+app.put('/api/startgame/:gameID/:largesthand', (req, res) => {
+ var gameID= req.params.gameID;
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
- gameDataParsed.largestHand = parseInt(req.params.largesthand);
- gameDataParsed.roundData[0].numOfCards = parseInt(req.params.largesthand);
+ gameDataParsed.gameDataObjects[gameID].largestHand = parseInt(req.params.largesthand);
+ gameDataParsed.gameDataObjects[gameID].roundData[0].numOfCards = parseInt(req.params.largesthand);
  var writeData = JSON.stringify(gameDataParsed, null,2);
  fs.writeFile('gameData.json', writeData, done)
  function done(){
@@ -77,77 +138,88 @@ app.put('/api/startgame/:largesthand', (req, res) => {
 
 
 //Get Data for bid round
-app.get('/api/bidround', (req, res) => {
+app.get('/api/bidround/:gameID', (req, res) => {
+ var gameID = req.params.gameID;
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
- var roundid = gameDataParsed.roundData.length -1;
- gameDataParsed.players.forEach(function(item, index, array) {
+ var thisGameData = gameDataParsed.gameDataObjects[gameID];
+ var roundid = thisGameData.roundData.length -1;
+ thisGameData.players.forEach(function(item, index, array) {
    item.currentBid = 0;
  });
- gameDataParsed.roundData[roundid].totalBid = 0;
+ thisGameData.roundData[roundid].totalBid = 0;
+ gameDataParsed.gameDataObjects[gameID]=thisGameData;
  var writeData = JSON.stringify(gameDataParsed, null,2);
  fs.writeFile('gameData.json', writeData, done)
  function done(){
    res.json({
-    players: gameDataParsed.players,
-    roundData: gameDataParsed.roundData,
-    numofPlayer: gameDataParsed.numPlayers,
+    players: thisGameData.players,
+    roundData: thisGameData.roundData,
+    numofPlayer: thisGameData.numPlayers,
    });
  }
 });
 
 //Get Data for score board
-app.get('/api/scoreboard', (req, res) => {
+app.get('/api/scoreboard/:gameID', (req, res) => {
+ var gameID = req.params.gameID;
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
+ var thisGameData= gameDataParsed.gameDataObjects[gameID];
  res.json({
-    players: gameDataParsed.players,
-    roundData: gameDataParsed.roundData,
+    players: thisGameData.players,
+    roundData: thisGameData.roundData,
    });
 });
 
 //Get Data for score round Component
-app.get('/api/scoreround', (req, res) => {
+app.get('/api/scoreround/:gameID', (req, res) => {
+  var gameID= req.params.gameID;
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
+ var thisGameData = gameDataParsed.gameDataObjects[gameID];
+
  res.json({
-    players: gameDataParsed.players,
-    roundData: gameDataParsed.roundData,
-    cardCountDirection: gameDataParsed.cardCountDirection,
-    largestHand: gameDataParsed.largestHand
+    players: thisGameData.players,
+    roundData: thisGameData.roundData,
+    cardCountDirection: thisGameData.cardCountDirection,
+    largestHand: thisGameData.largestHand
    });
 });
 
 //Get Data for Final Scores
-//Need To sort our players
-app.get('/api/finalscores', (req, res) => {
+app.get('/api/finalscores/:gameID', (req, res) => {
+ var gameID = req.params.gameID;
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
  res.json({
-    players: gameDataParsed.players,
+    players: gameDataParsed.gameDataObjects[gameID].players,
    });
 });
 
 
 //update player's bid
-app.put('/api/bid/:playerid/:roundid/:newbid', (req, res) => {
+app.put('/api/bid/:gameID/:playerid/:roundid/:newbid', (req, res) => {
+ var gameID = req.params.gameID;
  var playerid= req.params.playerid;
  var roundid = req.params.roundid;
  var newbid = req.params.newbid;
  var gameData = fs.readFileSync('gameData.json');
  var gameDataParsed = JSON.parse(gameData);
- gameDataParsed.players[playerid].currentBid = parseInt(newbid);
+ var thisGameData= gameDataParsed.gameDataObjects[gameID];
+ thisGameData.players[playerid].currentBid = parseInt(newbid);
 
  var totalbids=0;
- for (var i = 0; i < gameDataParsed.players.length; i++) {
-   totalbids= totalbids + gameDataParsed.players[i].currentBid;
+ for (var i = 0; i < thisGameData.players.length; i++) {
+   totalbids= totalbids + thisGameData.players[i].currentBid;
  }
- gameDataParsed.roundData[roundid].totalBid = totalbids;
+ thisGameData.roundData[roundid].totalBid = totalbids;
+ gameDataParsed.gameDataObjects[gameID]= thisGameData;
  var writeData = JSON.stringify(gameDataParsed, null,2);
  fs.writeFile('gameData.json', writeData, done)
  function done(){
   res.json({
-             players:  gameDataParsed.players,
+             players:  thisGameData.players,
              totalBid: totalbids
            });
   }
@@ -175,36 +247,39 @@ app.get('/api/totalbids', (req, res) => {
 
 
 //update scores after a round
-app.put('/api/score/:roundNum/:newscores', (req, res) => {
+app.put('/api/score/:gameID/:roundNum/:newscores', (req, res) => {
+  var gameID = req.params.gameID;
   var newscores = JSON.parse(req.params.newscores);
   var round = JSON.parse(req.params.roundNum);
   var gameData = fs.readFileSync('gameData.json');
   var gameDataParsed = JSON.parse(gameData);
-  gameDataParsed.players.forEach(function(item, index, array) {
+  var thisGameData = gameDataParsed.gameDataObjects[gameID];
+  thisGameData.players.forEach(function(item, index, array) {
     item.score = newscores[index];
   });
-  if((gameDataParsed.roundData[(round-1)].numOfCards ===1)&& (gameDataParsed.cardCountDirection ==="Down" )){
-    gameDataParsed.cardCountDirection = "Up";
-    gameDataParsed.roundData[round]={
+  if((thisGameData.roundData[(round-1)].numOfCards ===1)&& (thisGameData.cardCountDirection ==="Down" )){
+    thisGameData.cardCountDirection = "Up";
+    thisGameData.roundData[round]={
       roundNum: round + 1,
       numOfCards: 1 ,
       totalBid: 0
     }
   }
-  else if (gameDataParsed.cardCountDirection ==="Up") {
-    gameDataParsed.roundData[round]={
+  else if (thisGameData.cardCountDirection ==="Up") {
+    thisGameData.roundData[round]={
       roundNum: round + 1,
-      numOfCards: (gameDataParsed.roundData[(round-1)].numOfCards) + 1,
+      numOfCards: (thisGameData.roundData[(round-1)].numOfCards) + 1,
       totalBid: 0
     }
   }
   else{
-    gameDataParsed.roundData[round]={
+    thisGameData.roundData[round]={
       roundNum: round + 1,
-      numOfCards: (gameDataParsed.roundData[(round-1)].numOfCards) -1,
+      numOfCards: (thisGameData.roundData[(round-1)].numOfCards) -1,
       totalBid: 0
     }
   }
+  gameDataParsed.gameDataObjects[gameID]=thisGameData;
   var writeData = JSON.stringify(gameDataParsed, null,2);
   fs.writeFile('gameData.json', writeData, done)
   function done(){

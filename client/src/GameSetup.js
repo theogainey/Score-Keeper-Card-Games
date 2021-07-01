@@ -17,6 +17,8 @@ import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore'
 import PlayCircleFilledWhiteIcon from '@material-ui/icons/PlayCircleFilledWhite';
 import TextField from '@material-ui/core/TextField';
 import FaultyGamePlayAlert from './FaultyGamePlayAlert';
+import {useParams} from "react-router-dom";
+
 
 const useStyles = makeStyles((theme) => ({
   setupSection: {
@@ -143,8 +145,13 @@ function GamePlaySetting(props){
     </Paper>
   );
 }
-
-export default class GameSetup extends React.Component  {
+export default function GameSetupFunction(){
+  var {id} = useParams();
+  return(
+    <GameSetup gameID={id}/>
+  )
+}
+ class GameSetup extends React.Component  {
  constructor(){
    super();
    this.handleChange = this.handleChange.bind(this);
@@ -176,32 +183,40 @@ export default class GameSetup extends React.Component  {
    this.setState({largestHand: a});
  }
  componentDidMount() {
-   this.loadData();
+   var id = this.props.gameID;
+   this.loadData(id);
  }
 
- loadData() {
-   fetch('/api/data').then(response => response.json()).then(data => {
+ loadData(id) {
+   fetch('/api/data/'+id).then(response => response.json()).then(data => {
    this.setState({ players: data.players });
   }).catch(err => {console.log(err);});
  }
  addPlayer(){
+   var id =this.props.gameID;
+    if(this.state.newPlayerField!==""){
     var name = this.state.newPlayerField;
-    fetch('/api/newplayer/'+ name,{method: 'post'}).then(response => response.json()).then(data => {
+    fetch('/api/newplayer/'+id+'/'+ name,{method: 'post'}).then(response => response.json()).then(data => {
     this.setState({ players: data.players,
       numPlayers: this.state.numPlayers+1,
-      newPlayerField:" " });
+      newPlayerField:"" });
    }).catch(err => {console.log(err);});
+    }
   }
 
  resetPlayers(){
-   fetch('/api/resetgamedata',{method: 'put'}).then(response => response.json()).then(data => {
+   var id =this.props.gameID;
+
+   fetch('/api/resetgamedata/' +id,{method: 'put'}).then(response => response.json()).then(data => {
    this.setState({ players: data.players });
   }).catch(err => {console.log(err);});
  }
  startGame(props){
+   var id =this.props.gameID;
+
    if(!(this.state.largestHand===0)&&(this.state.players.length>=2)){
-     fetch('/api/startgame/' + this.state.largestHand,{method: 'put'}).then(() => {
-       window.open("/bidround","_self");
+     fetch('/api/startgame/'+id +'/'+ this.state.largestHand,{method: 'put'}).then(() => {
+       window.open("/bidround/"+id,"_self");
       }).catch(err => {console.log(err);});
    }
    else if (!(this.state.players.length>=2)) {

@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import PersonIcon from '@material-ui/icons/Person';
 import Avatar from '@material-ui/core/Avatar';
+import {useParams} from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -53,9 +54,15 @@ function Player(props){
   );
 };
 
+export default function ScoreBoardFunction(){
+  let {id} = useParams();
+  return(
+    <ScoreBoard gameID={id}/>
+  )
+}
 
 
-export default class ScoreBoard extends React.Component  {
+ class ScoreBoard extends React.Component  {
   constructor(){
     super();
     this.state = {
@@ -65,11 +72,12 @@ export default class ScoreBoard extends React.Component  {
     };
   }
   componentDidMount() {
-    this.loadData();
+    var id = this.props.gameID;
+    this.loadData(id);
   }
 
-  loadData() {
-    fetch('/api/scoreboard').then(response => response.json()).then(data => {
+  loadData(id) {
+    fetch('/api/scoreboard/'+id).then(response => response.json()).then(data => {
     this.setState({
       roundNum: data.roundData[(data.roundData.length -1)].roundNum ,
        players: data.players,
